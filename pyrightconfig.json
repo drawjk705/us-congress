@@ -1,0 +1,14 @@
+{
+    "include": [""],
+    "ignore": ["typings"],
+
+    "venvPath": "./.venv/",
+
+    "verboseOutput": true,
+
+    "typeCheckingMode": "strict",
+
+    "reportFunctionMemberAccess": false,
+    "reportPrivateUsage": false,
+    "reportUnknownArgumentType": false
+}

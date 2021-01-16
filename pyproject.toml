@@ -1,0 +1,53 @@
+[tool.poetry]
+name = "us-congress"
+version = "0.1.0"
+description = "Client to work with US Congress data"
+authors = ["Joel Krim <drawjk705@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+requests = "^2.25.1"
+pandas = "^1.2.0"
+punq = "^0.4.1"
+python-dotenv = "^0.15.0"
+us = "^2.0.2"
+isort = "^5.7.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.1"
+black = { version = "^20.8b1", allow-prereleases = true }
+pytest-mock = "^3.5.0"
+callee = "^0.3.1"
+hypothesis = "^5.47.0"
+pytest-sugar = "^0.9.4"
+pytest-clarity = "^0.3.0-alpha.0"
+pytest-cov = "^2.10.1"
+data-science-types = "^0.2.22"
+pytest-randomly = "^3.5.0"
+poethepoet = "^0.9.0"
+pytest-tldr = "^0.2.2"
+jupyter_nbextensions_configurator = "^0.4.1"
+ipython = "^7.19.0"
+jupyterlab = "^3.0.1"
+ipywidgets = "^7.6.2"
+matplotlib = "^3.3.3"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poe.tasks]
+test = "pytest -m \"not integration\""
+test-integration = "pytest -m integration"
+test-coverage = "pytest --cov-report term-missing:skip-covered --cov=congress tests/"
+typing = "python3 run_pyright.py"
+lint-fix = "black . --exclude typings"
+lint = "black . --check --exclude typings"
+sort-imports = "isort ."
+clean = "rm rf ./**/__pycache__"
+
+[tool.isort]
+profile = "black"
+src_paths = ["congress", "tests"]
+skip_glob = '**/typings/**'

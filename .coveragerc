@@ -1,0 +1,11 @@
+[paths]
+source =
+    congress/
+
+[run]
+omit =
+    tests/*
+    *interface.py
+    *__init__.py
+    *models.py
+    *log/*

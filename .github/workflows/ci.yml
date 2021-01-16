@@ -1,0 +1,185 @@
+name: CI
+
+on:
+    pull_request:
+
+jobs:
+    lint:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                python-version: [3.8, 3.9]
+            fail-fast: false
+
+        steps:
+            - name: checkout repo
+              uses: actions/checkout@v2
+
+            - name: set up python
+              uses: actions/setup-python@v2
+              with:
+                  python-version: ${{ matrix.python-version }}
+
+            - name: set up node
+              uses: actions/setup-node@v2
+              with:
+                  node-version: '12'
+
+            - name: install poetry
+              uses: snok/install-poetry@v1.1.1
+              with:
+                  version: 1.1.4
+                  virtualenvs-create: true
+                  virtualenvs-in-project: true
+
+            - name: load cached venv
+              id: cached-poetry-dependencies
+              uses: actions/cache@v2
+              with:
+                  path: .venv
+                  key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+
+            - name: install poetry dependencies
+              run: poetry install
+              if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+
+            - name: load cached npm
+              id: cached-npm-dependencies
+              uses: actions/cache@v2
+              with:
+                  path: ~/.npm
+                  key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+
+            - name: install pyright dependencies
+              run: sudo npm install -g pyright
+
+            - name: lint
+              run: |
+                  source ./.venv/bin/activate
+                  poe typing
+                  poe lint
+                  poe sort-imports -c
+
+    test:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                python-version: [3.8, 3.9]
+            fail-fast: false
+
+        steps:
+            - name: checkout repo
+              uses: actions/checkout@v2
+
+            - name: set up python
+              uses: actions/setup-python@v2
+              with:
+                  python-version: ${{ matrix.python-version }}
+
+            - name: install poetry action
+              uses: snok/install-poetry@v1.1.1
+              with:
+                  version: 1.1.4
+                  virtualenvs-create: true
+                  virtualenvs-in-project: true
+
+            - name: Load cached venv
+              id: cached-poetry-dependencies
+              uses: actions/cache@v2
+              with:
+                  path: .venv
+                  key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+
+            - name: install poetry dependencies
+              run: poetry install
+              if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+
+            - name: test it
+              run: |
+                  source ./.venv/bin/activate
+                  poe test-coverage -vv
+                  coverage report
+
+    build:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                python-version: [3.8, 3.9]
+            fail-fast: false
+
+        steps:
+            - name: checkout repo
+              uses: actions/checkout@v2
+
+            - name: set up python
+              uses: actions/setup-python@v2
+              with:
+                  python-version: ${{ matrix.python-version }}
+
+            - name: install poetry
+              uses: snok/install-poetry@v1.1.1
+              with:
+                  version: 1.1.4
+                  virtualenvs-create: true
+                  virtualenvs-in-project: true
+
+            - name: load cached venv
+              id: cached-poetry-dependencies
+              uses: actions/cache@v2
+              with:
+                  path: .venv
+                  key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+
+            - name: install poetry dependencies
+              run: poetry install
+              if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+
+            - name: try build
+              run: poetry build
+
+    enforce-title:
+        runs-on: ubuntu-latest
+        steps:
+            - name: echo title
+              run: |
+                  echo "title is '$TITLE'"
+              env:
+                  TITLE: ${{ github.event.pull_request.title }}
+                  JSON: ${{ toJson(github.event) }}
+
+            - name: check for major
+              id: major
+              if: "startsWith(github.event.pull_request.title, 'breaking: ')"
+              run: |
+                  echo "::set-output name=exists::1"
+
+            - name: check for minor
+              id: minor
+              if: "startsWith(github.event.pull_request.title, 'feat: ')"
+              run: |
+                  echo "::set-output name=exists::1"
+
+            - name: check for patch
+              id: patch
+              if: "startsWith(github.event.pull_request.title, 'fix: ')"
+              run: |
+                  echo "::set-output name=exists::1"
+
+            - name: check for chore
+              id: chore
+              if: "startsWith(github.event.pull_request.title, 'chore: ')"
+              run: |
+                  echo "::set-output name=exists::1"
+
+            - name: enforce
+              run: |
+                  if [ -z "$IS_MAJOR" ] && [ -z "$IS_MINOR" ] && [ -z "$IS_PATCH" ] && [ -z "$IS_CHORE" ];
+                  then
+                    echo "PR must be prefixes with one of the following: ['breaking: ', 'feat: ', 'fix: ', 'chore: ']"
+                    exit 1
+                  fi
+              env:
+                  IS_MAJOR: ${{ steps.major.outputs.exists }}
+                  IS_MINOR: ${{ steps.minor.outputs.exists }}
+                  IS_PATCH: ${{ steps.patch.outputs.exists }}
+                  IS_CHORE: ${{ steps.chore.outputs.exists }}
