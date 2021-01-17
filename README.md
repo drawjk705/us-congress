@@ -32,7 +32,7 @@ pip install us_congress
 
 ```python
 >>> from us_congress import Congress
->>> cong = getCongress(116)
+>>> cong = Congress(116)
 >>> cong
 <Congress 116>
 ```
