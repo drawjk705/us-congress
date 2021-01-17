@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "us_congress"
-version = "0.1.0"
+version = "0.1.1"
 description = "Client to work with US Congress data"
 authors = ["Joel Krim <drawjk705@gmail.com>"]
 license = "MIT"
