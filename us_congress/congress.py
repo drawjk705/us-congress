@@ -6,6 +6,7 @@ from typing import cast
 import dotenv
 import pandas
 import punq
+
 from us_congress._api.fetch import CongressApiFetchService
 from us_congress._api.interface import ICongressApiFetchService
 from us_congress._client import CongressClient

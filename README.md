@@ -18,6 +18,12 @@ PROPUBLICA_CONG_KEY=<your key>
 
 ## Getting started
 
+To install with pip, simply run
+
+```bash
+pip install us_congress
+```
+
 ```python
 >>> from us_congress import Congress
 >>> cong = getCongress(116)

@@ -49,5 +49,5 @@ clean = "rm rf ./**/__pycache__"
 
 [tool.isort]
 profile = "black"
-src_paths = ["congress", "tests"]
+src_paths = ["us_congress", "tests"]
 skip_glob = '**/typings/**'

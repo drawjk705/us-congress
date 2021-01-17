@@ -5,12 +5,12 @@ import pytest
 import requests
 from pytest import MonkeyPatch
 from pytest_mock.plugin import MockerFixture
-from us_congress._exceptions import NoCongressApiKeyException
-from us_congress.congress import Congress
 
 from tests.integration.congress.mockApi import MOCK_CONGRESS_API
 from tests.serviceTestFixtures import ServiceTestFixture
 from tests.utils import MockRes
+from us_congress._exceptions import NoCongressApiKeyException
+from us_congress.congress import Congress
 
 
 @pytest.fixture(scope="function", autouse=True)
