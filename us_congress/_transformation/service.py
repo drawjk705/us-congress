@@ -2,9 +2,8 @@ from typing import Any, Dict, List
 
 import pandas as pd
 import us
-
-from congress._api.models import Congressman
-from congress._transformation.interface import ICongressDataTransformationService
+from us_congress._api.models import Congressman
+from us_congress._transformation.interface import ICongressDataTransformationService
 
 
 class CongressDataTransformationService(ICongressDataTransformationService):
@@ -29,4 +28,4 @@ class CongressDataTransformationService(ICongressDataTransformationService):
 
         sortKeys = ["fips"] + (["district"] if "district" in membersFlat[0] else [])
 
-        return pd.DataFrame(membersFlat).sort_values(by=sortKeys)
+        return pd.DataFrame(membersFlat).sort_values(by=sortKeys).reset_index(drop=True)

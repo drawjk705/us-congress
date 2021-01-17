@@ -143,21 +143,29 @@ jobs:
                   poetry version minor
 
             - name: maybe bump patch
-              if: startsWith(github.event.head_commit.message, 'fix')
+              if: startsWith(github.event.head_commit.message, 'fix') || startsWith(github.event.head_commit.message, 'test')
               run: |
                   poetry version patch
                   echo "isPatch=1" >> $GITHUB_ENV
 
-            - name: poetry publish
+            - name: poetry publish to pypi
+              if: ${{ !startsWith(github.event.head_commit.message, 'test') }}
               run: |
                   poetry build
                   poetry config pypi-token.pypi ${{ secrets.PYPI_TOKEN }}
                   poetry publish
 
+            - name: poetry publish to pypi-test
+              run: |
+                  poetry build
+                  poetry config repositories.testpypi https://test.pypi.org/legacy/
+                  poetry config pypi-token.testpypi ${{ secrets.PYPI_TEST_TOKEN }}
+                  poetry publish -r testpypi
+
             - name: get version number
               run: |
                   VERSION=$(poetry version)
-                  VERSION=v${VERSION#"us-data "}
+                  VERSION=v${VERSION#"us-congress "}
                   echo "version=$VERSION" >> $GITHUB_ENV
 
             - name: commit to master
@@ -175,7 +183,7 @@ jobs:
 
     github_release:
         needs: [tag_and_publish]
-        if: ${{ !startsWith(github.event.head_commit.message, 'chore') }}
+        if: ${{ !startsWith(github.event.head_commit.message, 'chore') && !startsWith(github.event.head_commit.message, 'test')}}
         runs-on: ubuntu-latest
         steps:
             - name: checkout repo

@@ -1,12 +1,12 @@
 [tool.poetry]
-name = "us-congress"
+name = "us_congress"
 version = "0.1.0"
 description = "Client to work with US Congress data"
 authors = ["Joel Krim <drawjk705@gmail.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.8"
 requests = "^2.25.1"
 pandas = "^1.2.0"
 punq = "^0.4.1"
@@ -40,7 +40,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.poe.tasks]
 test = "pytest -m \"not integration\""
 test-integration = "pytest -m integration"
-test-coverage = "pytest --cov-report term-missing:skip-covered --cov=congress tests/"
+test-coverage = "pytest --cov-report term-missing:skip-covered --cov=us_congress tests/"
 typing = "python3 run_pyright.py"
 lint-fix = "black . --exclude typings"
 lint = "black . --check --exclude typings"

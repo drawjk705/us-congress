@@ -1,6 +1,5 @@
 import pandas as pd
-
-from congress._members.interface import ICongressMemberRepository
+from us_congress._members.interface import ICongressMemberRepository
 
 
 class CongressClient:

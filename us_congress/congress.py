@@ -6,18 +6,17 @@ from typing import cast
 import dotenv
 import pandas
 import punq
-
-from congress._api.fetch import CongressApiFetchService
-from congress._api.interface import ICongressApiFetchService
-from congress._client import CongressClient
-from congress._config import CongressConfig
-from congress._exceptions import NoCongressApiKeyException
-from congress._members.interface import ICongressMemberRepository
-from congress._members.service import CongressMemberRepository
-from congress._transformation.interface import ICongressDataTransformationService
-from congress._transformation.service import CongressDataTransformationService
-from congress._utils.log.configureLogger import DEFAULT_LOGFILE, configureLogger
-from congress._utils.log.factory import ILoggerFactory, LoggerFactory
+from us_congress._api.fetch import CongressApiFetchService
+from us_congress._api.interface import ICongressApiFetchService
+from us_congress._client import CongressClient
+from us_congress._config import CongressConfig
+from us_congress._exceptions import NoCongressApiKeyException
+from us_congress._members.interface import ICongressMemberRepository
+from us_congress._members.service import CongressMemberRepository
+from us_congress._transformation.interface import ICongressDataTransformationService
+from us_congress._transformation.service import CongressDataTransformationService
+from us_congress._utils.log.configureLogger import DEFAULT_LOGFILE, configureLogger
+from us_congress._utils.log.factory import ILoggerFactory, LoggerFactory
 
 _transformer = CongressDataTransformationService()
 _loggerFactory = LoggerFactory()
@@ -63,4 +62,4 @@ class Congress:
         return self._client.getRepresentatives().copy(deep=True)
 
     def __repr__(self) -> str:
-        return f"<Congress number={self._config.congress}>"
+        return f"<Congress {self._config.congress}>"

@@ -171,11 +171,17 @@ jobs:
               run: |
                   echo "::set-output name=exists::1"
 
+            - name: check for test
+              id: test
+              if: "startsWith(github.event.pull_request.title, 'test: ')"
+              run: |
+                  echo "::set-output name=exists::1"
+
             - name: enforce
               run: |
-                  if [ -z "$IS_MAJOR" ] && [ -z "$IS_MINOR" ] && [ -z "$IS_PATCH" ] && [ -z "$IS_CHORE" ];
+                  if [ -z "$IS_MAJOR" ] && [ -z "$IS_MINOR" ] && [ -z "$IS_PATCH" ] && [ -z "$IS_CHORE" ] && [ -z "$IS_TEST" ];
                   then
-                    echo "PR must be prefixes with one of the following: ['breaking: ', 'feat: ', 'fix: ', 'chore: ']"
+                    echo "PR must be prefixes with one of the following: ['breaking: ', 'feat: ', 'fix: ', 'chore: ', 'test: ']"
                     exit 1
                   fi
               env:
@@ -183,3 +189,4 @@ jobs:
                   IS_MINOR: ${{ steps.minor.outputs.exists }}
                   IS_PATCH: ${{ steps.patch.outputs.exists }}
                   IS_CHORE: ${{ steps.chore.outputs.exists }}
+                  IS_TEST: ${{ steps.test.outputs.exists }}

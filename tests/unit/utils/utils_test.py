@@ -3,10 +3,9 @@ from typing import cast
 from unittest.mock import MagicMock
 
 from pytest_mock import MockerFixture
-
-from congress._utils.chunk import chunk
-from congress._utils.timer import timer
-from congress._utils.unique import getUnique
+from us_congress._utils.chunk import chunk
+from us_congress._utils.timer import timer
+from us_congress._utils.unique import getUnique
 
 
 def test_chunk_givenChunkLessThanSize():
@@ -42,10 +41,10 @@ def test_timer_logsAndReturnsValues(mocker: MockerFixture):
     def fn() -> int:
         return 1
 
-    mockLogging = mocker.patch("congress._utils.timer.logging")
+    mockLogging = mocker.patch("us_congress._utils.timer.logging")
     mockLogger = MagicMock()
     cast(MagicMock, cast(logging, mockLogging).getLogger).return_value = mockLogger
-    mockPerfCounter = mocker.patch("congress._utils.timer.time")
+    mockPerfCounter = mocker.patch("us_congress._utils.timer.time")
     mockPerfCounter.perf_counter.side_effect = [1, 2]  # type: ignore
 
     retval = fn()
