@@ -1,6 +1,7 @@
 from typing import Any, Dict, List, cast
 
 import requests
+
 from us_congress._api.interface import ICongressApiFetchService
 from us_congress._api.models import Representative, Senator
 from us_congress._config import CongressConfig

@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List
 
 import pandas as pd
+
 from us_congress._api.models import Congressman
 
 
