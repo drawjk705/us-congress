@@ -2,13 +2,16 @@ name: CI
 
 on:
     pull_request:
+    push:
+        branches:
+            - main
 
 jobs:
     lint:
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                python-version: [3.8, 3.9]
+                python-version: [3.9]
             fail-fast: false
 
         steps:
@@ -37,7 +40,7 @@ jobs:
               uses: actions/cache@v2
               with:
                   path: .venv
-                  key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+                  key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}-${{ secrets.CACHE_VERSION }}
 
             - name: install poetry dependencies
               run: poetry install
@@ -48,7 +51,7 @@ jobs:
               uses: actions/cache@v2
               with:
                   path: ~/.npm
-                  key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+                  key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}-${{ secrets.CACHE_VERSION }}
 
             - name: install pyright dependencies
               run: sudo npm install -g pyright
@@ -64,7 +67,7 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                python-version: [3.8, 3.9]
+                python-version: [3.9]
             fail-fast: false
 
         steps:
@@ -88,7 +91,7 @@ jobs:
               uses: actions/cache@v2
               with:
                   path: .venv
-                  key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+                  key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}-${{ secrets.CACHE_VERSION }}
 
             - name: install poetry dependencies
               run: poetry install
@@ -104,7 +107,7 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                python-version: [3.8, 3.9]
+                python-version: [3.9]
             fail-fast: false
 
         steps:
@@ -128,7 +131,7 @@ jobs:
               uses: actions/cache@v2
               with:
                   path: .venv
-                  key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+                  key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}-${{ secrets.CACHE_VERSION }}
 
             - name: install poetry dependencies
               run: poetry install
@@ -138,6 +141,7 @@ jobs:
               run: poetry build
 
     enforce-title:
+        if: github.event_name == 'pull_request'
         runs-on: ubuntu-latest
         steps:
             - name: echo title
@@ -145,7 +149,6 @@ jobs:
                   echo "title is '$TITLE'"
               env:
                   TITLE: ${{ github.event.pull_request.title }}
-                  JSON: ${{ toJson(github.event) }}
 
             - name: check for major
               id: major
@@ -171,17 +174,17 @@ jobs:
               run: |
                   echo "::set-output name=exists::1"
 
-            - name: check for test
-              id: test
-              if: "startsWith(github.event.pull_request.title, 'test: ')"
+            - name: check for prerelease
+              id: prerelease
+              if: "startsWith(github.event.pull_request.title, 'prerelease: ')"
               run: |
                   echo "::set-output name=exists::1"
 
             - name: enforce
               run: |
-                  if [ -z "$IS_MAJOR" ] && [ -z "$IS_MINOR" ] && [ -z "$IS_PATCH" ] && [ -z "$IS_CHORE" ] && [ -z "$IS_TEST" ];
+                  if [ -z "$IS_MAJOR" ] && [ -z "$IS_MINOR" ] && [ -z "$IS_PATCH" ] && [ -z "$IS_CHORE" ] && [ -z "$IS_PRERELEASE" ];
                   then
-                    echo "PR must be prefixes with one of the following: ['breaking: ', 'feat: ', 'fix: ', 'chore: ', 'test: ']"
+                    echo "PR must be prefixes with one of the following: ['breaking: ', 'feat: ', 'fix: ', 'chore: ', prerelease: ']"
                     exit 1
                   fi
               env:
@@ -189,4 +192,52 @@ jobs:
                   IS_MINOR: ${{ steps.minor.outputs.exists }}
                   IS_PATCH: ${{ steps.patch.outputs.exists }}
                   IS_CHORE: ${{ steps.chore.outputs.exists }}
-                  IS_TEST: ${{ steps.test.outputs.exists }}
+                  IS_PRERELEASE: ${{ steps.prerelease.outputs.exists }}
+
+    dispatch-event:
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && !startsWith(github.event.head_commit.message, 'chore') }}
+        needs: [test, lint, build]
+        runs-on: ubuntu-latest
+        steps:
+            - name: check for major
+              id: major
+              if: "startsWith(github.event.head_commit.message, 'breaking: ')"
+              run: |
+                  echo "bump_type=major" >> $GITHUB_ENV
+
+            - name: check for minor
+              id: minor
+              if: "startsWith(github.event.head_commit.message, 'feat: ')"
+              run: |
+                  echo "bump_type=minor" >> $GITHUB_ENV
+
+            - name: check for patch
+              id: patch
+              if: "startsWith(github.event.head_commit.message, 'fix: ')"
+              run: |
+                  echo "bump_type=patch" >> $GITHUB_ENV
+
+            - name: check for prerelease
+              id: prerelease
+              if: "startsWith(github.event.head_commit.message, 'prerelease: ')"
+              run: |
+                  echo "bump_type=prerelease" >> $GITHUB_ENV
+
+            - name: make sure bump type isn't empty
+              id: check-if-empty
+              run: |
+                  if [ -z "$bump_type" ];
+                  then
+                      echo "should_tag=0" >> $GITHUB_ENV
+                  else
+                      echo "should_tag=1" >> $GITHUB_ENV
+                  fi
+
+            - name: dispatch to release workflow
+              if: ${{ env.should_tag == 1 }}
+              uses: ph-fritsche/action-dispatch@v1
+              with:
+                  token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+                  type: workflow
+                  ident: release.yml
+                  payload: '{ "bump_type": "${{ env.bump_type }}" }'

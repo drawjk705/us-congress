@@ -1,0 +1,36 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+    - repo: meta
+      hooks:
+          - id: check-hooks-apply
+    - repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: v3.4.0
+      hooks:
+          - id: check-yaml
+          - id: check-merge-conflict
+
+    - repo: https://github.com/psf/black
+      rev: 20.8b1
+      hooks:
+          - id: black
+            language_version: python3
+
+    - repo: https://github.com/PyCQA/isort
+      rev: 5.7.0
+      hooks:
+          - id: isort
+
+    - repo: local
+      hooks:
+          - id: pyright
+            name: pyright type validation
+            entry: pyright
+            language: system
+            types: [python]
+
+          - id: commit-message-prefix
+            name: validate commit message prefix
+            language: pygrep
+            entry: '\A(?!(breaking|feat|fix|chore|prerelease): )'
+            stages: [commit-msg]
