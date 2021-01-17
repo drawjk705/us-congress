@@ -1,8 +1,8 @@
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
-![Release](https://github.com/drawjk705/us_congress/workflows/Release/badge.svg)
-![CI](https://github.com/drawjk705/us_congress/workflows/CI/badge.svg)
+![Release](https://github.com/drawjk705/us-congress/workflows/Release/badge.svg)
+![CI](https://github.com/drawjk705/us-congress/workflows/CI/badge.svg)
 
 # US Congress
 
