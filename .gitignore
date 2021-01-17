@@ -156,4 +156,3 @@ dmypy.json
 db-scripts/setup/*.sql
 cache/
 *.ipynb
-**typings/

@@ -1,108 +1,13 @@
 name: Release
 on:
-    push:
-        branches:
-            - main
+    workflow_dispatch:
+        inputs:
+            bump_type:
+                description: type of bump -- [major, minor, patch, prerelease]
+                required: true
+
 jobs:
-    lint:
-        runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                python-version: [3.8, 3.9]
-            fail-fast: false
-
-        steps:
-            - name: checkout repo
-              uses: actions/checkout@v2
-
-            - name: set up python
-              uses: actions/setup-python@v2
-              with:
-                  python-version: ${{ matrix.python-version }}
-
-            - name: set up node
-              uses: actions/setup-node@v2
-              with:
-                  node-version: '12'
-
-            - name: install poetry
-              uses: snok/install-poetry@v1.1.1
-              with:
-                  version: 1.1.4
-                  virtualenvs-create: true
-                  virtualenvs-in-project: true
-
-            - name: load cached venv
-              id: cached-poetry-dependencies
-              uses: actions/cache@v2
-              with:
-                  path: .venv
-                  key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
-
-            - name: install poetry dependencies
-              run: poetry install
-              if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-
-            - name: load cached npm
-              id: cached-npm-dependencies
-              uses: actions/cache@v2
-              with:
-                  path: ~/.npm
-                  key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-
-            - name: install pyright dependencies
-              run: sudo npm install -g pyright
-
-            - name: lint
-              run: |
-                  source ./.venv/bin/activate
-                  poe typing
-                  poe lint
-                  poe sort-imports -c
-
-    test:
-        runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                python-version: [3.8, 3.9]
-            fail-fast: false
-
-        steps:
-            - name: check out repo
-              uses: actions/checkout@v2
-
-            - name: set up python
-              uses: actions/setup-python@v2
-              with:
-                  python-version: ${{ matrix.python-version }}
-
-            - name: install poetry action
-              uses: snok/install-poetry@v1.1.1
-              with:
-                  version: 1.1.4
-                  virtualenvs-create: true
-                  virtualenvs-in-project: true
-
-            - name: load cached venv
-              id: cached-poetry-dependencies
-              uses: actions/cache@v2
-              with:
-                  path: .venv
-                  key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
-
-            - name: install poetry dependencies
-              run: poetry install
-              if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-
-            - name: test it
-              run: |
-                  source ./.venv/bin/activate
-                  poe test-coverage -vv
-                  coverage report
-
     tag_and_publish:
-        needs: [lint, test]
-        if: ${{ !startsWith(github.event.head_commit.message, 'chore') }}
         runs-on: ubuntu-latest
         steps:
             - name: checkout repo
@@ -125,31 +30,20 @@ jobs:
               uses: actions/cache@v2
               with:
                   path: .venv
-                  key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+                  key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}-${{ secrets.CACHE_VERSION }}
 
             - name: install poetry dependencies
               run: poetry install
               if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
 
-            - name: maybe bump major
-              if: startsWith(github.event.head_commit.message, 'breaking')
+            - name: bump version
               run: |
-                  poetry version major
-                  echo "isMajor=1" >> $GITHUB_ENV
-
-            - name: maybe bump minor
-              if: startsWith(github.event.head_commit.message, 'feat')
-              run: |
-                  poetry version minor
-
-            - name: maybe bump patch
-              if: startsWith(github.event.head_commit.message, 'fix') || startsWith(github.event.head_commit.message, 'test')
-              run: |
-                  poetry version patch
-                  echo "isPatch=1" >> $GITHUB_ENV
+                  echo $BUMP_TYPE
+                  poetry version $BUMP_TYPE
+              env:
+                  BUMP_TYPE: ${{ github.event.inputs.bump_type }}
 
             - name: poetry publish to pypi
-              if: ${{ !startsWith(github.event.head_commit.message, 'test') }}
               run: |
                   poetry build
                   poetry config pypi-token.pypi ${{ secrets.PYPI_TOKEN }}
@@ -164,9 +58,8 @@ jobs:
 
             - name: get version number
               run: |
-                  VERSION=$(poetry version)
-                  VERSION=v${VERSION#"us-congress "}
-                  echo "version=$VERSION" >> $GITHUB_ENV
+                  VERSION=$(poetry version --short)
+                  echo "version=v$VERSION" >> $GITHUB_ENV
 
             - name: commit to master
               uses: EndBug/add-and-commit@v6
@@ -183,7 +76,7 @@ jobs:
 
     github_release:
         needs: [tag_and_publish]
-        if: ${{ !startsWith(github.event.head_commit.message, 'chore') && !startsWith(github.event.head_commit.message, 'test')}}
+        if: ${{ !startsWith(github.event.head_commit.message, 'chore') }}
         runs-on: ubuntu-latest
         steps:
             - name: checkout repo
@@ -204,4 +97,4 @@ jobs:
                   tag_name: ${{ steps.version_num.outputs.TAGGED_VERSION }}
                   release_name: Release ${{ steps.version_num.outputs.TAGGED_VERSION }}
                   draft: false
-                  prerelease: false
+                  prerelease: startsWith(github.event.head.commit.message, 'prerelease')
