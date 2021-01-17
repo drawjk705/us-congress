@@ -46,7 +46,7 @@ precommit-run = "pre-commit run --all-files"
 precommit-update = "pre-commit autoupdate"
 sort-imports = "isort ."
 test = "pytest -m \"not integration\""
-test-coverage = "pytest --cov-report term-missing:skip-covered --cov=the_census tests/"
+test-coverage = "pytest --cov-report term-missing:skip-covered --cov=us_congress tests/"
 test-integration = "pytest -m integration"
 typing = "pyright --outputjson"
 
