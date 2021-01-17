@@ -1,5 +1,4 @@
 import pandas as pd
-
 from us_congress._members.interface import ICongressMemberRepository
 
 

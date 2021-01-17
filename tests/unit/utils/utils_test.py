@@ -3,7 +3,6 @@ from typing import cast
 from unittest.mock import MagicMock
 
 from pytest_mock import MockerFixture
-
 from us_congress._utils.chunk import chunk
 from us_congress._utils.timer import timer
 from us_congress._utils.unique import getUnique

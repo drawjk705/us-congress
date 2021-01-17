@@ -3,7 +3,6 @@ from logging import Logger
 from typing import List, cast
 
 import pandas as pd
-
 from us_congress._api.interface import ICongressApiFetchService
 from us_congress._api.models import Congressman
 from us_congress._members.interface import ICongressMemberRepository

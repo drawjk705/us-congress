@@ -2,7 +2,6 @@ from typing import Any, Dict, List
 
 import pandas as pd
 import us
-
 from us_congress._api.models import Congressman
 from us_congress._transformation.interface import ICongressDataTransformationService
 
