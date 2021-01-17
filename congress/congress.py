@@ -63,4 +63,4 @@ class Congress:
         return self._client.getRepresentatives().copy(deep=True)
 
     def __repr__(self) -> str:
-        return f"<Congress number={self._config.congress}>"
+        return f"<Congress {self._config.congress}>"

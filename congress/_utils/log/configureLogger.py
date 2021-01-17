@@ -3,7 +3,7 @@ import sys
 
 from congress._utils.log.filters import ModuleFilter
 
-DEFAULT_LOGFILE = ".log"
+DEFAULT_LOGFILE = "congress.log"
 
 
 def configureLogger(logFile: str) -> None:

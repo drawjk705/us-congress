@@ -6,7 +6,7 @@ authors = ["Joel Krim <drawjk705@gmail.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.8"
 requests = "^2.25.1"
 pandas = "^1.2.0"
 punq = "^0.4.1"

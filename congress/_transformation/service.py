@@ -29,4 +29,4 @@ class CongressDataTransformationService(ICongressDataTransformationService):
 
         sortKeys = ["fips"] + (["district"] if "district" in membersFlat[0] else [])
 
-        return pd.DataFrame(membersFlat).sort_values(by=sortKeys)
+        return pd.DataFrame(membersFlat).sort_values(by=sortKeys).reset_index(drop=True)

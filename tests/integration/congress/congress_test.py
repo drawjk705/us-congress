@@ -142,4 +142,4 @@ class TestCongress(ServiceTestFixture[DummyClass]):
     def test_repr(self):
         cong = Congress(116)
 
-        assert str(cong) == "<Congress number=116>"
+        assert str(cong) == "<Congress 116>"
