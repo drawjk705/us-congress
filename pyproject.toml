@@ -3,7 +3,7 @@ authors = ["Joel Krim <drawjk705@gmail.com>"]
 description = "Client to work with US Congress data"
 license = "MIT"
 name = "us_congress"
-version = "0.1.1"
+version = "0.1.2-alpha.0"
 
 [tool.poetry.dependencies]
 pandas = "^1.2.0"
