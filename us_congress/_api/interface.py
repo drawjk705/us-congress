@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-from congress._api.models import Representative, Senator
+from us_congress._api.models import Representative, Senator
 
 
 class ICongressApiFetchService(ABC):

@@ -1,8 +1,8 @@
 from typing import Any, Dict
 
-from congress._api.fetch import CongressApiFetchService
-from congress._api.models import Congressman, Representative, Senator
-from congress._config import CongressConfig
+from us_congress._api.fetch import CongressApiFetchService
+from us_congress._api.models import Congressman, Representative, Senator
+from us_congress._config import CongressConfig
 from tests.serviceTestFixtures import ApiServiceTestFixture
 from tests.utils import MockRes
 

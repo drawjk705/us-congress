@@ -19,7 +19,7 @@ PROPUBLICA_CONG_KEY=<your key>
 ## Getting started
 
 ```python
->>> from congress import Congress
+>>> from us_congress import Congress
 >>> cong = getCongress(116)
 >>> cong
 <Congress 116>

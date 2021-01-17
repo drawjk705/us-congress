@@ -3,7 +3,7 @@ from typing import List
 
 import pandas as pd
 
-from congress._api.models import Congressman
+from us_congress._api.models import Congressman
 
 
 class ICongressDataTransformationService(ABC):

@@ -6,8 +6,8 @@ import requests
 from pytest import MonkeyPatch
 from pytest_mock.plugin import MockerFixture
 
-from congress._exceptions import NoCongressApiKeyException
-from congress.congress import Congress
+from us_congress._exceptions import NoCongressApiKeyException
+from us_congress.congress import Congress
 from tests.integration.congress.mockApi import MOCK_CONGRESS_API
 from tests.serviceTestFixtures import ServiceTestFixture
 from tests.utils import MockRes

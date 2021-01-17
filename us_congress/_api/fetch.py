@@ -2,9 +2,9 @@ from typing import Any, Dict, List, cast
 
 import requests
 
-from congress._api.interface import ICongressApiFetchService
-from congress._api.models import Representative, Senator
-from congress._config import CongressConfig
+from us_congress._api.interface import ICongressApiFetchService
+from us_congress._api.models import Representative, Senator
+from us_congress._config import CongressConfig
 
 BASE_URL = "https://api.propublica.org/congress/v1"
 

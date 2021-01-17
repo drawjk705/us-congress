@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "us-congress"
+name = "us_congress"
 version = "0.1.0"
 description = "Client to work with US Congress data"
 authors = ["Joel Krim <drawjk705@gmail.com>"]
